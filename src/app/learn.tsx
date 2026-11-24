@@ -1,0 +1,8 @@
+import React, { useState } from 'react';
+import { TextInput } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { banks, lessons } from '../data/tutorials';
+import { Page, Txt, AccessibleButton, useColors } from '../components/ui';
+import { TutorialCard } from '../components/TutorialCard';
+import { useLearning } from '../hooks/useLearning';
+export default function Learn() { const { bank } = useLocalSearchParams<{ bank: string }>(); const [query, setQuery] = useState(''); const [favorites, setFavorites] = useState(false); const { state } = useLearning(); const c = useColors(); const selected = banks.find(b => b.id === bank); const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); const filtered = lessons.filter(l => l.bank === bank && normalize(l.title).includes(normalize(query)) && (!favorites || state.favorites.includes(l.id))); return <Page title={selected?.name ?? 'Banco não encontrado'} subtitle="O que você quer aprender?"><TextInput accessibilityLabel="Pesquisar tutoriais pelo nome" placeholder="Pesquisar: saldo, Pix, extrato…" placeholderTextColor={c.muted} value={query} onChangeText={setQuery} style={{ padding: 18, minHeight: 60, borderRadius: 14, backgroundColor: c.surface, color: c.text, borderColor: c.border, borderWidth: 1, fontSize: 19 * state.preferences.font }} /><AccessibleButton title={favorites ? 'Ver todos' : 'Ver favoritos'} secondary onPress={() => setFavorites(!favorites)} />{filtered.map(l => <TutorialCard key={l.id} lesson={l} />)}{!filtered.length && <Txt>Nada encontrado. Tente outro nome.</Txt>}</Page>; }

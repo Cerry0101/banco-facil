@@ -1,0 +1,1 @@
+__d(function(g,r,i,a,m,e,d){"use strict";Object.defineProperty(e,'__esModule',{value:!0}),Object.defineProperty(e,"default",{enumerable:!0,get:function(){return o}}),r(d[0]);var n=r(d[1]),t=r(d[2]),u=r(d[3]),c=r(d[4]);function o(){return(0,c.jsx)(n.Page,{title:"Escolha seu banco",children:u.banks.map(n=>(0,c.jsx)(t.BankCard,{bank:n},n.id))})}},750,[12,758,760,761,6]);

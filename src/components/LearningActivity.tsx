@@ -1,0 +1,4 @@
+import React, { useState } from 'react';
+import { Lesson } from '../types';
+import { AccessibleButton, Card, Txt } from './ui';
+export function LearningActivity({ lesson, onAttempt, onFinish }: { lesson: Lesson; onAttempt: (correct: boolean) => void; onFinish: () => void }) { const [answer, setAnswer] = useState<number | null>(null); const correct = answer === lesson.answer; return <Card><Txt accessibilityRole="header" style={{ fontSize: 25, fontWeight: '800' }}>Vamos praticar?</Txt><Txt>{lesson.question}</Txt>{lesson.options.map((option, index) => <AccessibleButton key={option} title={option} secondary disabled={correct} onPress={() => { setAnswer(index); onAttempt(index === lesson.answer); }} />)}{answer !== null && <Txt accessibilityLiveRegion="polite">{correct ? 'Muito bem! ' : 'Tente outra vez. '}{lesson.feedback}</Txt>}{correct && <AccessibleButton title="Concluir" icon="checkmark-circle" onPress={onFinish} />}</Card>; }

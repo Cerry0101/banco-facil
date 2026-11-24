@@ -1,0 +1,4 @@
+import React, { useEffect, useState } from 'react';
+import { AccessibleButton, Txt } from './ui';
+import { narrate, stopNarration } from '../services/speech';
+export function AudioButton({ text }: { text: string }) { const [playing, setPlaying] = useState(false); const [error, setError] = useState(false); useEffect(() => () => { stopNarration(); }, []); return <><AccessibleButton title={playing ? 'Parar áudio' : 'Ouvir'} icon={playing ? 'stop-circle' : 'volume-high'} secondary onPress={() => { if (playing) { stopNarration(); setPlaying(false); } else { setError(false); setPlaying(true); narrate(text, () => { setError(true); setPlaying(false); }, () => setPlaying(false)); } }} />{error && <Txt accessibilityRole="alert">A voz não está disponível. Confira o mecanismo de voz em português nas configurações do aparelho. O texto continua disponível.</Txt>}</>; }

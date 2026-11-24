@@ -1,0 +1,43 @@
+import React from 'react';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Txt } from './ui';
+import { Pulse } from './Pulse';
+
+type Props = { topic: string; step: number; complete: boolean; target?: string; onNext: () => void };
+const blue = '#3f4cff';
+export function BBVisual({ topic, step, complete, target, onNext }: Props) {
+ const home = !complete && step === 0 && topic !== 'Comprovante Pix';
+ const central = !complete && step === 1 && (topic === 'Pix' || topic === 'Minhas chaves Pix');
+ const more = !complete && step === 1 && (topic === 'Fatura do cartão' || topic === 'Limite do cartão');
+ const title = home ? 'Olá, Ana Exemplo' : central ? 'Central Pix' : more ? 'Mais opções' : topic === 'Comprovante Pix' && !complete ? 'Solicitação concluída' : topic;
+ const label = (text: string) => <Txt style={s.text}>{text}</Txt>;
+ const tile = (name: string, icon: React.ComponentProps<typeof Ionicons>['name'] = 'apps-outline') => {
+  const active = name === target;
+  const content = <><Ionicons name={icon} size={27} color={blue} /><Txt style={[s.text, { textAlign: 'center', fontWeight: active ? '800' : '500' }]}>{name}</Txt>{active && <Txt style={s.tap}>☝ Toque aqui</Txt>}</>;
+  return active ? <Pulse key={name} style={{ width: '47%', flexGrow: 1 }}><Pressable accessibilityRole="button" accessibilityLabel={`Toque em ${name} na tela de exemplo`} onPress={onNext} style={[s.tile, s.active, { width: '100%' }]}>{content}</Pressable></Pulse> : <View key={name} style={s.tile}>{content}</View>;
+ };
+ const row = (a: string, b: string) => <View style={s.row}>{label(a)}<Txt style={[s.text, { fontWeight: '800', flexShrink: 1 }]}>{b}</Txt></View>;
+ const balance = <View style={{ paddingVertical: 14, gap: 4 }}><Txt style={s.white}>Saldo</Txt><Txt style={[s.white, { fontSize: 32, fontWeight: '800' }]}>{home && topic === 'Saldo' ? '••••' : 'R$ 850,00'}</Txt></View>;
+ return <View style={s.frame}>
+ <View style={s.banner}><Txt style={{ color: '#fff', fontSize: 12, textAlign: 'center' }}>EXEMPLO VISUAL • DADOS FICTÍCIOS</Txt></View>
+ <View style={s.header}><View style={s.row}><Ionicons name={home ? 'person-circle-outline' : 'arrow-back'} color="white" size={28} /><Txt style={{ color: '#fff', fontSize: 21, fontWeight: '700', flex: 1 }}>{title}</Txt>{home && topic === 'Saldo' ? <Pulse><Pressable accessibilityRole="button" accessibilityLabel="Toque em Mostrar saldo na tela de exemplo" onPress={onNext} style={s.eye}><Ionicons name="eye-outline" size={30} color={blue} /><Txt style={s.tap}>Toque</Txt></Pressable></Pulse> : <Ionicons name="eye-outline" color="white" size={25} />}</View>{home && <Txt style={{ color: '#fff', fontSize: 13 }}>Ag. 0000 • Conta 00000-0</Txt>}{(home || central || topic === 'Saldo' || topic === 'Extrato') && balance}</View>
+ <View style={s.body}>
+ {home && <><View style={s.grid}>{tile('Extrato', 'document-text-outline')}{tile('Pagar', 'barcode-outline')}{tile('Pix', 'diamond-outline')}{tile('Transferência', 'swap-horizontal')}{tile('Investimentos', 'trending-up')}{tile('Cartões', 'card-outline')}{tile('Empréstimo', 'cash-outline')}{tile('Ver mais', 'ellipsis-horizontal')}</View><View style={s.box}>{label('Pix')}{label('Digite ou cole uma chave Pix')}</View></>}
+ {central && <><Txt style={s.heading}>Pagar</Txt><View style={s.grid}>{tile('Fazer um Pix', 'diamond-outline')}{tile('Ler QR Code', 'qr-code-outline')}{tile('Pix Copia e Cola', 'copy-outline')}</View><Txt style={s.heading}>Receber</Txt><View style={s.grid}>{tile('Criar QR Code', 'qr-code-outline')}{tile('Minhas Chaves Pix', 'key-outline')}</View></>}
+ {more && <><View style={s.grid}>{tile('Shopping BB', 'bag-outline')}{tile('Pagamento', 'barcode-outline')}{tile('Seguro', 'umbrella-outline')}{tile('Consórcios', 'people-outline')}{tile('Cartão Fatura', 'document-text-outline')}{tile('Cartão Limite', 'options-outline')}{tile('Poupança Resgatar', 'wallet-outline')}{tile('Recarga', 'phone-portrait-outline')}</View></>}
+ {!home && !central && !more && <>
+ {topic === 'Saldo' && <View style={s.box}>{row('Saldo disponível', 'R$ 850,00')}{label('Este é o dinheiro da conta de exemplo.')}</View>}
+ {topic === 'Extrato' && <><View style={s.grid}>{tile('Pix','diamond-outline')}{tile('Pagar','barcode-outline')}{tile('Filtros','options-outline')}</View><Txt style={s.heading}>Outros extratos</Txt>{label('Conta corrente')}<View style={s.grid}>{tile('Set')}{tile('Out')}{tile('Nov','calendar-outline')}</View>{complete && <><View style={s.box}>{row('Pix recebido', '+ R$ 1.000,00')}{label('Entrada • Ana Exemplo')}</View><View style={s.box}>{row('Compra no mercado', '− R$ 150,00')}{label('Saída • Mercado Exemplo')}</View></>}</>}
+ {topic === 'Pix' && <><Txt style={s.heading}>Como deseja transferir?</Txt><View style={s.row}>{label('CHAVE PIX')}{label('AG. E CONTA')}</View><View style={s.box}>{label('Informe a chave Pix')}{label('maria@example.com')}</View><Txt style={s.heading}>Recentes</Txt><View style={s.box}>{label('Maria Exemplo')}{label('Chave: maria@example.com')}</View></>}
+ {topic === 'Transferência' && <><Txt style={s.heading}>Dados de destino</Txt><View style={s.box}>{row('Banco', 'Banco do Brasil • 001')}{row('Tipo de conta', 'Conta corrente')}{row('Agência', '0000')}{row('Conta', '00000-0')}</View></>}
+ {topic === 'Minhas chaves Pix' && <><Txt style={s.heading}>Conta corrente</Txt><View style={s.box}><Ionicons name="key-outline" size={30} color={blue}/>{label('ana@example.com')}{label('Chave de e-mail fictícia')}</View><View style={s.yellow}>{label('CADASTRAR')}</View></>}
+ {topic === 'Fatura do cartão' && <><View style={s.row}>{label('OUT')}{label('NOV')}{label('DEZ')}</View><View style={s.box}>{label('Fatura aberta')}<Txt style={s.amount}>R$ 120,00</Txt></View>{row('Vencimento', '15/12/2026')}<View style={s.box}><Txt style={s.heading}>Resumo da fatura</Txt>{row('Mercado Exemplo', 'R$ 80,00')}{row('Farmácia Exemplo', 'R$ 40,00')}{row('Fatura atual', 'R$ 120,00')}</View><View style={s.yellow}>{label('PAGAR FATURA')}</View></>}
+ {topic === 'Limite do cartão' && <><Txt style={s.heading}>Qual limite você quer?</Txt>{row('Limite atual', 'R$ 1.000,00')}<View style={s.box}>{label('Escolha o novo limite')}{label('R$ 1.000,00')}</View>{row('Limite utilizado', 'R$ 120,00')}{row('Disponível', 'R$ 880,00')}<View style={s.yellow}>{label('AVANÇAR')}</View></>}
+ {topic === 'Pagar boleto' && (!complete ? <><View style={s.scanner}><Ionicons name="scan-outline" size={100} color="#fff"/><Txt style={s.white}>Enquadre o código de barras</Txt></View><View style={s.grid}>{tile('Digitar código','keypad-outline')}{tile('Abrir PDF','document-outline')}</View></> : <><Txt style={s.heading}>Exemplo de boleto</Txt><View style={s.box}>{row('Beneficiário','Loja Exemplo')}{row('Valor','R$ 50,00')}{row('Vencimento','30/11/2026')}{label('|||| ||| || ||||| ||| || ||||')}{label('Código ilustrativo, sem validade')}</View>{label('Ilustração educativa da cobrança.')}</>)}
+ {topic === 'Comprovante Pix' && <><Txt style={s.heading}>{complete ? 'Comprovante ilustrativo' : '✓ Pronto! Pix enviado.'}</Txt><View style={s.box}>{row('Valor', 'R$ 20,00')}{row('Data', '22/11/2026')}{label('Maria Exemplo')}{label('Chave: maria@example.com')}</View>{!complete && tile('Ver comprovante Pix','document-text-outline')}<Txt style={s.tap}>Exemplo sem validade bancária</Txt></>}
+ </>}
+ </View></View>;
+}
+const s = StyleSheet.create({frame:{borderWidth:2,borderColor:'#cbd0e9',borderRadius:24,overflow:'hidden',backgroundColor:'#f4f5f7'},banner:{backgroundColor:'#202d75',padding:7},header:{backgroundColor:blue,padding:18,gap:8},white:{color:'#fff',textAlign:'center',fontSize:18},body:{padding:14,gap:16},text:{fontSize:15,lineHeight:22,color:'#20232c'},heading:{fontSize:20,fontWeight:'700',color:'#20232c'},grid:{flexDirection:'row',flexWrap:'wrap',gap:8},tile:{width:'47%',flexGrow:1,minHeight:90,borderWidth:1,borderColor:'#dedfe5',borderRadius:16,padding:10,backgroundColor:'#fff',alignItems:'center',justifyContent:'center',gap:6},active:{borderWidth:3,borderColor:'#173d88',backgroundColor:'#fffa86'},tap:{color:'#173d88',fontSize:13,fontWeight:'800',textAlign:'center'},eye:{backgroundColor:'#fffa86',padding:8,borderRadius:12,alignItems:'center'},row:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:10,flexWrap:'wrap'},box:{backgroundColor:'#fff',borderWidth:1,borderColor:'#e1e3e9',borderRadius:16,padding:16,gap:12},yellow:{backgroundColor:'#fffb25',borderRadius:12,padding:16,alignItems:'center'},amount:{fontSize:29,color:blue,fontWeight:'800',textAlign:'center'},scanner:{minHeight:200,backgroundColor:'#414558',borderRadius:14,alignItems:'center',justifyContent:'center',padding:20,gap:15}});
+
